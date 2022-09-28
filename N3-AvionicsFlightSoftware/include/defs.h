@@ -31,6 +31,7 @@
 
 // Pin to start ejection charge
 #define EJECTION_PIN 4
+#define buzzer_pin 32
 
 const uint8_t GPS_TX_PIN = 17;
 const uint8_t GPS_RX_PIN = 16;
@@ -67,7 +68,7 @@ const int BELOW_APOGEE_LEVEL_DISPLACEMENT = 20;
 // Gryroscope values in the x, y and z direcion
 // filtered altitude, velocity and acceleration
 // GPS longitude, laltitude and altitude and state
-struct LogData
+struct Data
 {
     uint64_t timeStamp;
     float altitude;
@@ -84,12 +85,14 @@ struct LogData
     float latitude;
     float longitude;
     float gpsAltitude;
+    float temperature;
 };
 // SensorReadings contains the measurement we are getting
 // from the sensors bmp and mpu
 struct SensorReadings
 {
     float altitude;
+    float temperature;
     float ax;
     float ay;
     float az;
@@ -116,13 +119,13 @@ struct FilteredValues
     float acceleration;
 };
 // SendValues contains the data points we will be sending over lora
-struct SendValues
-{
-    uint64_t timeStamp;
-    float altitude;
-    uint16_t state;
-    float latitude;
-    float longitude;
-};
+// struct SendValues
+// {
+//     uint64_t timeStamp;
+//     float altitude;
+//     uint16_t state;
+//     float latitude;
+//     float longitude;
+// };
 
 #endif

@@ -10,7 +10,6 @@
 #include <SoftwareSerial.h>
 #include <SPI.h>
 
-
 // using uart 2 for serial communication
 SoftwareSerial GPSModule(GPS_RX_PIN, GPS_TX_PIN);
 
@@ -30,12 +29,16 @@ void init_mpu()
         debugln("Could not find a valid MPU6050 sensor, check wiring!");
         while (1)
         {
-            //TODO: add beep to notify 
+           // produces a sound with a frequency of 3khz
+             tone(buzzer_pin,3000);
         }
     }
     else
     {
         debugln("MPU6050 FOUND");
+        tone(buzzer_pin,3000);
+        delay(1000);
+        noTone(buzzer_pin);
     }
 
     mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
@@ -51,19 +54,23 @@ void init_bmp()
         debugln("Could not find a valid BMP085 sensor, check wiring!");
         while (1)
         {
-            // TODO: add beep to notify
+         //produces a sound with a frequency of 2khz
+              tone(buzzer_pin,2000);
         }
     }
     else
     {
         debugln("BMP180 FOUND");
+        tone(buzzer_pin,2000);
+        delay(1000);
+        noTone(buzzer_pin);
     }
 }
 
 // function to initialize bmp, mpu, lora module and the sd card module
 void init_sensors()
 {
-   // init_gps();
+    init_gps();
     init_bmp();
     init_mpu();
 }
@@ -180,6 +187,7 @@ struct SensorReadings get_readings()
     return_val.ax = a.acceleration.x;
     return_val.ay = a.acceleration.y;
     return_val.az = a.acceleration.z;
+    return_val.temperature=bmp.readTemperature();
 
     return_val.gx = g.gyro.x;
     return_val.gy = g.gyro.y;

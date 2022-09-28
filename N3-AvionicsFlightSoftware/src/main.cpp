@@ -54,9 +54,9 @@ void ejection()
     }
 }
 
-struct LogData readData()
+struct Data readData()
 {
-    struct LogData ld = {0};
+    struct Data ld = {0};
     struct SensorReadings readings = {0};
     struct FilteredValues filtered_values = {0};
 
@@ -71,19 +71,17 @@ struct LogData readData()
     portEXIT_CRITICAL(&mutex);
     previousAltitude = filtered_values.displacement;
 
-    ld = formart_SD_data(readings, filtered_values);
+    ld = formart_data(readings, filtered_values);
     ld.state = state;
     ld.timeStamp = millis();
-    debugln("displacement");
-    debugln(filtered_values.displacement);
 
     return ld;
 }
 
 /*
 **********Time Taken for each Task******************
-        Get Data Task  - 36ms
-        WiFiTelemetryTask -74ms
+        Get Data Task  - 74ms
+        WiFiTelemetryTask -36ms
         GPS Task - 1000ms
         SD Write Task - 60ms
 */
@@ -91,8 +89,8 @@ struct LogData readData()
 void GetDataTask(void *parameter)
 {
 
-    struct LogData ld = {0};
-    struct SendValues sv = {0};
+    struct Data ld = {0};
+    // struct SendValues sv = {0};
 
     static int droppedWiFiPackets = 0;
     static int droppedSDPackets = 0;
@@ -101,9 +99,9 @@ void GetDataTask(void *parameter)
     {
 
         ld = readData();
-        sv = formart_send_data(ld);
+        // sv = formart_send_data(ld);
 
-        if (xQueueSend(wifi_telemetry_queue, (void *)&sv, 0) != pdTRUE)
+        if (xQueueSend(wifi_telemetry_queue, (void *)&ld, 0) != pdTRUE)
         {
             droppedWiFiPackets++;
         }
@@ -119,35 +117,13 @@ void GetDataTask(void *parameter)
         vTaskDelay(37 / portTICK_PERIOD_MS);
     }
 }
-void readGPSTask(void *parameter)
-{
-
-    struct GPSReadings gpsReadings = {0};
-
-    static int droppedGPSPackets = 0;
-
-    for (;;)
-    {
-        gpsReadings = get_gps_readings();
-
-        if (xQueueSend(gps_queue, (void *)&gpsReadings, 0) != pdTRUE)
-        {
-            droppedGPSPackets++;
-        }
-
-        debugf("Dropped GPS Packets : %d\n", droppedGPSPackets);
-
-        // yield SD Write task
-        // TODO: increase this up from 60 to 1000 in steps of 60 to improve queue performance at the expense of GPS
-        //GPS will send 1 reading in 2s when set to 1000
-        vTaskDelay(960 / portTICK_PERIOD_MS);
-    }
-}
 
 void WiFiTelemetryTask(void *parameter)
 {
-    struct SendValues sv = {0};
-    struct SendValues svRecords;
+    // struct SendValues sv = {0};
+    // struct SendValues svRecords;
+    struct Data sv = {0};
+    struct Data svRecords;
     struct GPSReadings gpsReadings = {0};
     float latitude = 0;
     float longitude = 0;
@@ -189,11 +165,38 @@ void WiFiTelemetryTask(void *parameter)
     }
 }
 
+void readGPSTask(void *parameter)
+{
+
+    struct GPSReadings gpsReadings = {0};
+
+    static int droppedGPSPackets = 0;
+
+    for (;;)
+    {
+        gpsReadings = get_gps_readings();
+
+        if (xQueueSend(gps_queue, (void *)&gpsReadings, 0) != pdTRUE)
+        {
+            droppedGPSPackets++;
+        }
+
+        debugf("Dropped GPS Packets : %d\n", droppedGPSPackets);
+
+        // yield SD Write task
+        // TODO: increase this up from 60 to 1000 in steps of 60 to improve queue performance at the expense of GPS
+        //GPS will send 1 reading in 2s when set to 1000
+        vTaskDelay(960 / portTICK_PERIOD_MS);
+    }
+}
+
+
+
 void SDWriteTask(void *parameter)
 {
 
-    struct LogData ld = {0};
-    struct LogData ldRecords[5];
+    struct Data ld = {0};
+    struct Data ldRecords[5];
     struct GPSReadings gps = {0};
     float latitude = 0;
     float longitude = 0;
@@ -230,25 +233,29 @@ void setup()
 
     // set up ejection pin
     pinMode(EJECTION_PIN, OUTPUT);
+    //set up buzzer pin
+    pinMode(buzzer_pin,OUTPUT);
 
       //setup_wifi();
     create_Accesspoint();
     init_sensors();
 
-    //initSDCard();
+    initSDCard();
 
     // get the base_altitude
     BASE_ALTITUDE = get_base_altitude();
 
-    wifi_telemetry_queue = xQueueCreate(wifi_queue_length, sizeof(SendValues));
-    sdwrite_queue = xQueueCreate(sd_queue_length, sizeof(LogData));
+    wifi_telemetry_queue = xQueueCreate(wifi_queue_length, sizeof(Data));
+    sdwrite_queue = xQueueCreate(sd_queue_length, sizeof(Data));
     gps_queue = xQueueCreate(gps_queue_length, sizeof(GPSReadings));
 
     // initialize core tasks
     xTaskCreatePinnedToCore(GetDataTask, "GetDataTask", 3000, NULL, 1, &GetDataTaskHandle, 0);
     xTaskCreatePinnedToCore(WiFiTelemetryTask, "WiFiTelemetryTask", 4000, NULL, 1, &WiFiTelemetryTaskHandle, 0);
-    //xTaskCreatePinnedToCore(readGPSTask, "ReadGPSTask", 3000, NULL, 1, &GPSTaskHandle, 1);
-   // xTaskCreatePinnedToCore(SDWriteTask, "SDWriteTask", 4000, NULL, 1, &SDWriteTaskHandle, 1);
+    xTaskCreatePinnedToCore(readGPSTask, "ReadGPSTask", 3000, NULL, 1, &GPSTaskHandle, 1);
+   xTaskCreatePinnedToCore(SDWriteTask, "SDWriteTask", 4000, NULL, 1, &SDWriteTaskHandle, 1);
+
+//    vTaskDelete(NULL);
 }
 void loop()
 {

@@ -9,10 +9,11 @@ void ejectionTimerCallback(TimerHandle_t ejectionTimerHandle);
 
 // formats data that we are going to save to SD card
 // We save all the data points we are collecting
-struct LogData formart_SD_data(SensorReadings readings, FilteredValues filtered_values)
+struct Data formart_data(SensorReadings readings, FilteredValues filtered_values)
 {
-  struct LogData ld = {0};
+  struct Data ld = {0};
   ld.altitude = readings.altitude;
+  ld.temperature= readings.temperature;
   ld.ax = readings.ax;
   ld.ay = readings.ay;
   ld.az = readings.az;
@@ -27,16 +28,16 @@ struct LogData formart_SD_data(SensorReadings readings, FilteredValues filtered_
 
 // formart_send_data This formats data we are going to send over LoRa
 // Currently we are sending altitude, state, timeStamp, longitude and latitude
-struct SendValues formart_send_data(LogData readings)
-{
-  struct SendValues sv = {0};
-  sv.altitude = readings.altitude;
-  sv.state = readings.state;
-  sv.timeStamp = readings.timeStamp;
-  sv.latitude = readings.latitude;
-  sv.longitude = readings.longitude;
-  return sv;
-}
+// struct SendValues formart_send_data(LogData readings)
+// {
+//   struct SendValues sv = {0};
+//   sv.altitude = readings.altitude;
+//   sv.state = readings.state;
+//   sv.timeStamp = readings.timeStamp;
+//   sv.latitude = readings.latitude;
+//   sv.longitude = readings.longitude;
+//   return sv;
+// }
 
 // get_base_altitude Finds the average of the current altitude from 100 readings
 float get_base_altitude()

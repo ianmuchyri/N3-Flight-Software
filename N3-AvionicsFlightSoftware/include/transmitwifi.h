@@ -111,9 +111,12 @@ void sendTelemetryWiFi(Data sv)
   // for (int i = 0; i < 5; i++)
   // {
     // publish whole message i json
-    char mqttMessage[200];
+    char mqttMessage[300];
     sprintf(mqttMessage, "{\"timestamp\":%lld,\"altitude\":%.3f,\"temperature\":%.3f,\"ax\":%.3f,\"ay\":%.3f,\"az\":%.3f,\"gx\":%.3f,\"gy\":%.3f,\"gz\":%.3f,\"filtered_s\":%.3f,\"filtered_v\":%.3f,\"filtered_a\":%.3f,\"state\":%d,\"longitude\":%.8f,\"latitude\":%.8f}", sv.timeStamp, sv.altitude,sv.temperature,sv.ax,sv.ay,sv.az,sv.gx,sv.gy,sv.gz,sv.filtered_s,sv.filtered_v,sv.filtered_a, sv.state, sv.longitude, sv.latitude);
     client.publish("esp32/message", mqttMessage);
+    // char mqttMessage[200];
+    // sprintf(mqttMessage, "{\"timestamp\":%lld,\"altitude\":%.3f,\"state\":%d,\"longitude\":%.8f,\"latitude\":%.8f}",sv.timeStamp, sv.altitude, sv.state, sv.longitude, sv.latitude);
+    // client.publish("esp32/message", mqttMessage);
     debugln(mqttMessage);
   // }
 }

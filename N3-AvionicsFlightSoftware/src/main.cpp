@@ -114,7 +114,7 @@ void GetDataTask(void *parameter)
         debugf("Dropped SD Packets : %d\n", droppedSDPackets);
 
         // yield to WiFi Telemetry task
-        vTaskDelay(37 / portTICK_PERIOD_MS);
+        vTaskDelay(74 / portTICK_PERIOD_MS);
     }
 }
 

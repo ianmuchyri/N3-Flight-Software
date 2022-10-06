@@ -39,6 +39,9 @@ const uint8_t GPS_RX_PIN = 16;
 const BaseType_t pro_cpu = 0;
 const BaseType_t app_cpu = 1;
 
+#define SETUP_AP true
+#define MQTT_PACKET_SIZE 300
+
 const char *ssid = "onboard";
 const char *password = "987654321";
 

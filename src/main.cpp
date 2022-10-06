@@ -63,9 +63,9 @@ struct Data readData()
     readings = get_readings();
 
     // TODO: very important to know the orientation of the altimeter
-    filtered_values = kalmanUpdate(readings.altitude, readings.ay);
+    filtered_values = kalmanUpdate(readings.altitude, readings.az);
 
-    // using mutex to modify state 
+    // using mutex to modify state
     portENTER_CRITICAL(&mutex);
     state = checkState(filtered_values.displacement, previousAltitude, filtered_values.velocity, filtered_values.acceleration, state);
     portEXIT_CRITICAL(&mutex);
@@ -143,21 +143,20 @@ void WiFiTelemetryTask(void *parameter)
         //         latitude = gpsReadings.latitude;
         //         longitude = gpsReadings.longitude;
         //     }
-            
-        // }
-         
-            xQueueReceive(wifi_telemetry_queue, (void *)&sv, 10);
-            svRecords = sv;
-            svRecords.latitude = latitude;
-            svRecords.longitude = longitude;
 
-            if (xQueueReceive(gps_queue, (void *)&gpsReadings, 10) == pdTRUE)
-            {
-                latitude = gpsReadings.latitude;
-                longitude = gpsReadings.longitude;
-            }
-  
-        
+        // }
+
+        xQueueReceive(wifi_telemetry_queue, (void *)&sv, 10);
+        svRecords = sv;
+        svRecords.latitude = latitude;
+        svRecords.longitude = longitude;
+
+        if (xQueueReceive(gps_queue, (void *)&gpsReadings, 10) == pdTRUE)
+        {
+            latitude = gpsReadings.latitude;
+            longitude = gpsReadings.longitude;
+        }
+
         handleWiFi(svRecords);
 
         // yield to Get Data task
@@ -185,12 +184,10 @@ void readGPSTask(void *parameter)
 
         // yield SD Write task
         // TODO: increase this up from 60 to 1000 in steps of 60 to improve queue performance at the expense of GPS
-        //GPS will send 1 reading in 2s when set to 1000
+        // GPS will send 1 reading in 2s when set to 1000
         vTaskDelay(960 / portTICK_PERIOD_MS);
     }
 }
-
-
 
 void SDWriteTask(void *parameter)
 {
@@ -218,7 +215,7 @@ void SDWriteTask(void *parameter)
                 longitude = gps.longitude;
             }
         }
-       
+
         appendToFile(ldRecords);
 
         // yield to GPS Task
@@ -233,11 +230,16 @@ void setup()
 
     // set up ejection pin
     pinMode(EJECTION_PIN, OUTPUT);
-    //set up buzzer pin
-    pinMode(buzzer_pin,OUTPUT);
+    // set up buzzer pin
+    pinMode(buzzer_pin, OUTPUT);
 
-      //setup_wifi();
+    client.setBufferSize(MQTT_PACKET_SIZE);
+
+#if SETUP_AP == true
     create_Accesspoint();
+#else
+    setup_wifi();
+#endif
     init_sensors();
 
     initSDCard();
@@ -253,9 +255,9 @@ void setup()
     xTaskCreatePinnedToCore(GetDataTask, "GetDataTask", 3000, NULL, 1, &GetDataTaskHandle, 0);
     xTaskCreatePinnedToCore(WiFiTelemetryTask, "WiFiTelemetryTask", 4000, NULL, 1, &WiFiTelemetryTaskHandle, 0);
     xTaskCreatePinnedToCore(readGPSTask, "ReadGPSTask", 3000, NULL, 1, &GPSTaskHandle, 1);
-   xTaskCreatePinnedToCore(SDWriteTask, "SDWriteTask", 4000, NULL, 1, &SDWriteTaskHandle, 1);
+    xTaskCreatePinnedToCore(SDWriteTask, "SDWriteTask", 4000, NULL, 1, &SDWriteTaskHandle, 1);
 
-//    vTaskDelete(NULL);
+    //    vTaskDelete(NULL);
 }
 void loop()
 {

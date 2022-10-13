@@ -33,38 +33,43 @@
 #define EJECTION_PIN 4
 #define buzzer_pin 32
 
-const uint8_t GPS_TX_PIN = 17;
-const uint8_t GPS_RX_PIN = 16;
+#define PRE_FLIGHT_GROUND_STATE 0
+#define POWERED_FLIGHT_STATE 1
+#define COASTING_STATE 2
+#define BALLISTIC_DESCENT_STATE 3
+#define CHUTE_DESCENT_STATE 4
+#define POST_FLIGHT_GROUND_STATE 5
 
-const BaseType_t pro_cpu = 0;
-const BaseType_t app_cpu = 1;
+#define GROUND_STATE_DISPLACEMENT 20
+#define BELOW_APOGEE_LEVEL_DISPLACEMENT 20
 
+<<<<<<< HEAD:N3-AvionicsFlightSoftware/include/defs.h
+#define GPS_TX_PIN 17
+#define GPS_RX_PIN 16
+
+extern const BaseType_t pro_cpu;
+extern const BaseType_t app_cpu;
+
+// network credentials
+#define ssid "Enter ssid"
+#define password "enter password"
+=======
 #define SETUP_AP true
 #define MQTT_PACKET_SIZE 300
 
 const char *ssid = "onboard";
 const char *password = "987654321";
+>>>>>>> dff4c80b2ca2dcd13d97aa8500f23a521ff3e5b9:include/defs.h
 
 // MQTT Broker IP address
-const char *mqtt_server = "192.168.4.2";
+#define mqtt_server "Enter ip address of computer hosting the MQTT broker"
+#define MQQT_PORT 1883
 
-const int MQQT_PORT = 1883;
-
-WiFiClient espClient;
-PubSubClient client(espClient);
+extern WiFiClient espClient;
+extern PubSubClient client;
 
 extern float BASE_ALTITUDE;
 extern float MAX_ALTITUDE;
-
-const int PRE_FLIGHT_GROUND_STATE = 0;
-const int POWERED_FLIGHT_STATE = 1;
-const int COASTING_STATE = 2;
-const int BALLISTIC_DESCENT_STATE = 3;
-const int CHUTE_DESCENT_STATE = 4;
-const int POST_FLIGHT_GROUND_STATE = 5;
-
-const int GROUND_STATE_DISPLACEMENT = 20;
-const int BELOW_APOGEE_LEVEL_DISPLACEMENT = 20;
 
 // This struct is used to save all our datapoints.
 // It includes rocket altitude, accelerations in the x, y and z directions
@@ -121,14 +126,5 @@ struct FilteredValues
     float velocity;
     float acceleration;
 };
-// SendValues contains the data points we will be sending over lora
-// struct SendValues
-// {
-//     uint64_t timeStamp;
-//     float altitude;
-//     uint16_t state;
-//     float latitude;
-//     float longitude;
-// };
 
 #endif

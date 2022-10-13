@@ -1,26 +1,20 @@
 #ifndef TRANSMITWIFI_H
 #define TRANSMITWIFI_H
 
-#include <WiFi.h>
 #include "defs.h"
 #include "functions.h"
 
-void mqttCallback(char *topic, byte *message, unsigned int length)
-{
-  debug("Message arrived on topic: ");
-  debug(topic);
-  debug(". Message: ");
-  String messageTemp;
+void mqttCallback(char *topic, byte *message, unsigned int length);
 
-  for (int i = 0; i < length; i++)
-  {
-    debug((char)message[i]);
-    messageTemp += (char)message[i];
-  }
-  debugln();
+void setup_wifi();
 
-  // Feel free to add more if statements to control more GPIOs with MQTT
+void reconnect();
 
+<<<<<<< HEAD:N3-AvionicsFlightSoftware/include/transmitwifi.h
+void sendTelemetryWiFi(Data sv);
+
+void handleWiFi(Data sv);
+=======
   // If a message is received on the topic esp32/output, you check if the message is either "on" or "off".
   // Changes the output state according to the message
   if (String(topic) == "esp32/ejection")
@@ -129,5 +123,6 @@ void handleWiFi(Data sv)
   client.loop();
   sendTelemetryWiFi(sv);
 }
+>>>>>>> dff4c80b2ca2dcd13d97aa8500f23a521ff3e5b9:include/transmitwifi.h
 
 #endif

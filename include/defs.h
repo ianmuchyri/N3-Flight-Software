@@ -43,7 +43,6 @@
 #define GROUND_STATE_DISPLACEMENT 20
 #define BELOW_APOGEE_LEVEL_DISPLACEMENT 20
 
-<<<<<<< HEAD:N3-AvionicsFlightSoftware/include/defs.h
 #define GPS_TX_PIN 17
 #define GPS_RX_PIN 16
 
@@ -53,13 +52,6 @@ extern const BaseType_t app_cpu;
 // network credentials
 #define ssid "Enter ssid"
 #define password "enter password"
-=======
-#define SETUP_AP true
-#define MQTT_PACKET_SIZE 300
-
-const char *ssid = "onboard";
-const char *password = "987654321";
->>>>>>> dff4c80b2ca2dcd13d97aa8500f23a521ff3e5b9:include/defs.h
 
 // MQTT Broker IP address
 #define mqtt_server "Enter ip address of computer hosting the MQTT broker"

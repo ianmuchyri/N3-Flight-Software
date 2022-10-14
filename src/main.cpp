@@ -64,11 +64,7 @@ struct Data readData()
     readings = get_readings();
 
     // TODO: very important to know the orientation of the altimeter
-<<<<<<< HEAD:N3-AvionicsFlightSoftware/src/main.cpp
     filtered_values = kalmanUpdate(readings.altitude, readings.ay-9.8);
-=======
-    filtered_values = kalmanUpdate(readings.altitude, readings.az);
->>>>>>> dff4c80b2ca2dcd13d97aa8500f23a521ff3e5b9:src/main.cpp
 
     // using mutex to modify state
     portENTER_CRITICAL(&mutex);
@@ -238,18 +234,8 @@ void setup()
     // set up buzzer pin
     pinMode(buzzer_pin, OUTPUT);
 
-<<<<<<< HEAD:N3-AvionicsFlightSoftware/src/main.cpp
     setup_wifi();
     //create_Accesspoint();
-=======
-    client.setBufferSize(MQTT_PACKET_SIZE);
-
-#if SETUP_AP == true
-    create_Accesspoint();
-#else
-    setup_wifi();
-#endif
->>>>>>> dff4c80b2ca2dcd13d97aa8500f23a521ff3e5b9:src/main.cpp
     init_sensors();
 
     initSDCard();
@@ -267,11 +253,7 @@ void setup()
     xTaskCreatePinnedToCore(readGPSTask, "ReadGPSTask", 3000, NULL, 1, &GPSTaskHandle, 1);
     xTaskCreatePinnedToCore(SDWriteTask, "SDWriteTask", 4000, NULL, 1, &SDWriteTaskHandle, 1);
 
-<<<<<<< HEAD:N3-AvionicsFlightSoftware/src/main.cpp
    vTaskDelete(NULL);
-=======
-    //    vTaskDelete(NULL);
->>>>>>> dff4c80b2ca2dcd13d97aa8500f23a521ff3e5b9:src/main.cpp
 }
 void loop()
 {
